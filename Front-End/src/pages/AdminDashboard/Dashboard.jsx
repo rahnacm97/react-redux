@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userDatas, setUserDatas] = useState([]);
 
+  //Edit button
   const handleEditClick = (user) => {
     setEditUser(user);
     setFormData({ name: user.name, email: user.email });
@@ -31,6 +32,7 @@ const Dashboard = () => {
     setError({ email: "", name: "", password: "", confirmPassword: "" });
   };
 
+  //Not admin go back to login
   useEffect(() => {
     const admin = JSON.parse(localStorage.getItem("admin"));
     if (!admin) {
@@ -42,6 +44,7 @@ const Dashboard = () => {
     fetchUser();
   }, []);
 
+  //User fetch
   const fetchUser = () => {
     const token = localStorage.getItem("token");
     api
@@ -59,10 +62,12 @@ const Dashboard = () => {
           icon: "error",
           title: "Error",
           text: error.response?.data?.msg || "Failed to fetch users",
+          confirmButtonText: "OK",
         });
       });
   };
 
+  //Delete user
   const deleteuser = (userId) => {
     const token = localStorage.getItem("token");
     Swal.fire({
@@ -81,7 +86,12 @@ const Dashboard = () => {
               Authorization: `Bearer ${token}`,
             },
           });
-          Swal.fire(res.data.msg);
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: res.data.msg || "User deleted successfully",
+            confirmButtonText: "OK",
+          });
           fetchUser();
         } catch (error) {
           console.log("User deleting error", error);
@@ -89,12 +99,14 @@ const Dashboard = () => {
             icon: "error",
             title: "Error",
             text: error.response?.data?.msg || "Failed to delete user",
+            confirmButtonText: "OK",
           });
         }
       }
     });
   };
 
+  //validation
   const validateEdit = () => {
     let isValid = true;
     const newError = { name: "", email: "" };
@@ -124,6 +136,7 @@ const Dashboard = () => {
     return isValid;
   };
 
+  //Save data
   const handleSave = async () => {
     if (validateEdit()) {
       const token = localStorage.getItem("token");
@@ -133,7 +146,12 @@ const Dashboard = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        Swal.fire(response.data.msg);
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.data.msg || "User updated successfully",
+          confirmButtonText: "OK",
+        });
         setModalOpen(false);
         fetchUser();
       } catch (error) {
@@ -142,6 +160,7 @@ const Dashboard = () => {
           icon: "error",
           title: "Error",
           text: error.response?.data?.msg || "Failed to update user",
+          confirmButtonText: "OK",
         });
       }
     }
@@ -197,6 +216,7 @@ const Dashboard = () => {
     return isValid;
   };
 
+  //New user
   const handleNewUserSave = async (e) => {
     e.preventDefault();
     if (validateNewUser()) {
@@ -215,7 +235,12 @@ const Dashboard = () => {
             },
           }
         );
-        Swal.fire(response.data.msg);
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.data.msg || "User added successfully",
+          confirmButtonText: "OK",
+        });
         setNewModal(false);
         setNewUser({ email: "", name: "", password: "", confirmPassword: "" });
         fetchUser();
@@ -225,6 +250,7 @@ const Dashboard = () => {
           icon: "error",
           title: "Error",
           text: error.response?.data?.message || error.response?.data?.msg || "Failed to add user",
+          confirmButtonText: "OK",
         });
       }
     }
@@ -279,7 +305,7 @@ const Dashboard = () => {
                     <th>User Profile</th>
                     <th>User Name</th>
                     <th>Email</th>
-                    <th>Create At</th>
+                    <th>Created At</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -380,7 +406,7 @@ const Dashboard = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="modal-close" onClick={closeNewModal}>×</button>
-            <h3 className="modal-title">Add Profile</h3>
+            <h3 className="modal-title">Add New User</h3>
             <form>
               <div className="form-group">
                 <label className="form-label" htmlFor="name">Name</label>

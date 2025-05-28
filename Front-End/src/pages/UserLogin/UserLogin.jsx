@@ -1,43 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setToken } from '../../features/userSlice';
-import api from '../../api/api';
-import Toastify from 'toastify-js';
-import 'toastify-js/src/toastify.css';
-import './UserLogin.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, setToken } from "../../features/userSlice";
+import api from "../../api/api";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
+import "./UserLogin.css";
 
 function UserLogin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user); 
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const { user } = useSelector((state) => state.user);
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (user && storedUser) {
-      navigate('/home');
+      navigate("/home");
     }
   }, [user, navigate]);
 
   const validate = () => {
     let isValid = true;
-    const newError = { email: '', password: '' };
+    const newError = { email: "", password: "" };
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!form.email) {
-      newError.email = 'Email is required';
+      newError.email = "Email is required";
       isValid = false;
     } else if (!emailPattern.test(form.email)) {
-      newError.email = 'Please enter a valid email address';
+      newError.email = "Please enter a valid email address";
       isValid = false;
     }
 
     if (!form.password) {
-      newError.password = 'Password is required';
+      newError.password = "Password is required";
       isValid = false;
     } else if (form.password.length < 8) {
-      newError.password = 'Password must be at least 8 characters long';
+      newError.password = "Password must be at least 8 characters long";
       isValid = false;
     }
 
@@ -49,29 +49,29 @@ function UserLogin() {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await api.post('/auth/login', form);
+        const response = await api.post("/auth/login", form);
         Toastify({
           text: response.data.msg,
           duration: 3000,
-          gravity: 'top',
-          position: 'right',
-          style:{
+          gravity: "top",
+          position: "right",
+          style: {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
           },
           close: true,
         }).showToast();
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-        navigate('/home');
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        navigate("/home");
       } catch (error) {
         Toastify({
-          text: error.response?.data?.msg || 'Login failed',
+          text: error.response?.data?.msg || "Login failed",
           duration: 3000,
-          gravity: 'top',
-          position: 'right',
-          style:{background: '#ef4444',}, 
+          gravity: "top",
+          position: "right",
+          style: { background: "#ef4444" },
           close: true,
         }).showToast();
       }
@@ -80,7 +80,7 @@ function UserLogin() {
 
   const handleSignup = (e) => {
     e.preventDefault();
-    navigate('/signup');
+    navigate("/signup");
   };
 
   return (
@@ -93,9 +93,9 @@ function UserLogin() {
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
-              type="email" 
+              type="email"
               id="email"
-              className="input-field" 
+              className="input-field"
               placeholder="Enter your email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -131,7 +131,7 @@ function UserLogin() {
           </div>
         </form>
         <div className="signup-redirect">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <a href="#" className="signup-link" onClick={handleSignup}>
             Sign Up
           </a>

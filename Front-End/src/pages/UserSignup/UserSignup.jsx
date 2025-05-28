@@ -6,11 +6,10 @@ import api from "../../api/api";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 
-import {useDispatch } from 'react-redux'
-import { setUser ,setToken} from "../../features/userSlice";
+import { useDispatch } from "react-redux";
+import { setUser, setToken } from "../../features/userSlice";
 function UserSignup() {
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -27,29 +26,29 @@ function UserSignup() {
   const Validate = () => {
     let isValid = true;
     const newError = { name: "", email: "", password: "", confirmPassword: "" };
-       const namePattern = /^[A-Za-z. ]+$/;
-       
+    const namePattern = /^[A-Za-z. ]+$/;
+
     if (!form.name) {
       newError.name = "Name is required";
       isValid = false;
     }
-    if(!namePattern.test(form.name)){
-      newError.name = "Name should contain only letters and spaces"
-      isValid = false
+    if (!namePattern.test(form.name)) {
+      newError.name = "Name should contain only letters and spaces";
+      isValid = false;
     }
- const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!form.email) {
       newError.email = "Email is required";
       isValid = false;
     }
-    if(!emailPattern.test(form.email)){
-      newError.email = "Please enter a valid email address"
-      isValid = false
+    if (!emailPattern.test(form.email)) {
+      newError.email = "Please enter a valid email address";
+      isValid = false;
     }
-    if(form.password < 8){
-      newError.password = "Password must be at least 8 characters long"
-      isValid = false
+    if (form.password < 8) {
+      newError.password = "Password must be at least 8 characters long";
+      isValid = false;
     }
     if (!form.password) {
       newError.password = "Password is required";
@@ -79,13 +78,13 @@ function UserSignup() {
           duration: 3000,
           gravity: "top",
           position: "right",
-          style:{
+          style: {
             background: "linear-gradient(to right, #00b09b, #96c93d)",
           },
           close: true,
         }).showToast();
-        dispatch(setUser(response.data.user))
-        dispatch(setToken(response.data.token))
+        dispatch(setUser(response.data.user));
+        dispatch(setToken(response.data.token));
         navigate("/");
       } catch (error) {
         console.log("signup user error", error);
@@ -96,7 +95,7 @@ function UserSignup() {
           position: "right",
           style: {
             background:
-            "linear-gradient(to right,rgb(222, 124, 124),rgb(130, 35, 6))",
+              "linear-gradient(to right,rgb(222, 124, 124),rgb(130, 35, 6))",
           },
           close: true,
         }).showToast();

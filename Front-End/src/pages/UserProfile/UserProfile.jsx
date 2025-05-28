@@ -1,17 +1,17 @@
 import "./UserProfile.css";
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../api/api';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../../api/api";
 import Header from "../../components/Header/Header";
 import { useSelector } from "react-redux";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [selectedfile, setSelectedFile] = useState(null);
   const [errors, setErrors] = useState({ name: "", email: "" });
   const { user } = useSelector((state) => state.user.user);
@@ -20,29 +20,31 @@ const UserProfile = () => {
     if (userData) {
       setName(userData.user.name);
       setEmail(userData.user.email);
-      setErrors({ name: "", email: "" }); // Reset errors when userData changes
+      setErrors({ name: "", email: "" }); 
     }
   }, [userData]);
 
   useEffect(() => {
     if (!user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
   useEffect(() => {
     if (id) {
-      api.get(`/auth/profile/${id}`)
-        .then(response => {
+      api
+        .get(`/auth/profile/${id}`)
+        .then((response) => {
           setUserData(response.data);
           setName(response.data.user.name);
           setEmail(response.data.user.email);
-        }).catch(error => {
-          console.log('user data fetching error', error);
+        })
+        .catch((error) => {
+          console.log("user data fetching error", error);
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.response?.data?.msg || 'Failed to fetch user data',
+            icon: "error",
+            title: "Error",
+            text: error.response?.data?.msg || "Failed to fetch user data",
           });
         });
     }
@@ -65,7 +67,8 @@ const UserProfile = () => {
       newError.name = "Name is required";
       isValid = false;
     } else if (!namePattern.test(name)) {
-      newError.name = "Name should contain only letters and spaces, with at least one letter";
+      newError.name =
+        "Name should contain only letters and spaces, with at least one letter";
       isValid = false;
     } else if (name.trim().length === 0) {
       newError.name = "Name cannot be only spaces";
@@ -87,30 +90,34 @@ const UserProfile = () => {
   const handleSaveProfile = async () => {
     if (validate()) {
       const formData = new FormData();
-      formData.append('email', email);
-      formData.append('name', name);
+      formData.append("email", email);
+      formData.append("name", name);
       if (selectedfile) {
-        formData.append('profilePic', selectedfile);
+        formData.append("profilePic", selectedfile);
       }
       try {
-        const response = await api.post(`/auth/profile/update/${id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const response = await api.post(
+          `/auth/profile/update/${id}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
         setUserData(response.data);
         setSelectedFile(null);
         Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'User profile updated successfully!',
-          confirmButtonColor: '#3b82f6',
+          icon: "success",
+          title: "Success",
+          text: "User profile updated successfully!",
+          confirmButtonColor: "#3b82f6",
         });
-        navigate('/home');
+        navigate("/home");
       } catch (error) {
-        console.log('user profile updating error', error);
+        console.log("user profile updating error", error);
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.response?.data?.msg || 'Failed to update user profile',
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.msg || "Failed to update user profile",
         });
       }
     }
@@ -132,7 +139,17 @@ const UserProfile = () => {
               />
             ) : (
               <div className="profile-pic-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="64"
+                  height="64"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
@@ -140,7 +157,17 @@ const UserProfile = () => {
             )}
 
             <label htmlFor="profile-upload" className="profile-pic-upload">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M12 5v14M5 12h14"></path>
               </svg>
               <input
@@ -178,7 +205,11 @@ const UserProfile = () => {
             {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
 
-          <button type="button" onClick={handleSaveProfile} className="save-button">
+          <button
+            type="button"
+            onClick={handleSaveProfile}
+            className="save-button"
+          >
             Save Profile
           </button>
         </div>

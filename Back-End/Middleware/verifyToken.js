@@ -1,17 +1,18 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
+const express = require("express");
+const jwt = require("jsonwebtoken");
 
+//JWT verification middleware
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'Cannot Access' });
+  if (!authHeader) return res.status(401).json({ message: "Cannot Access" });
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: 'Invalid token' });
+    if (err) return res.status(401).json({ message: "Invalid token" });
 
     req.user = decoded;
     next();
   });
 }
 
-module.exports = verifyToken
+module.exports = verifyToken;
