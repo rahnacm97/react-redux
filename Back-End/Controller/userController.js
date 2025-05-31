@@ -126,18 +126,18 @@ const getUserData = async (req, res) => {
   }
 };
 
-// const takeUserData = async(req,res)=>{
-//   try {
-//     const {id} = req.params
-//      const user = await User.findById(id);
-//    if(!user){
-//     return res.status(400).json({msg:'User not found'})
-//    }
-//    return res.status(200).json({msg:"User data taken successfully",user})
-//   } catch (error) {
-//    console.log('user data taking error',error);
-//   }
-// }
+const takeUserData = async(req,res)=>{
+  try {
+    const {id} = req.params
+     const user = await User.findById(id);
+   if(!user){
+    return res.status(400).json({msg:'User not found'})
+   }
+   return res.status(200).json({msg:"User data taken successfully",user})
+  } catch (error) {
+   console.log('user data taking error',error);
+  }
+}
 
 module.exports = {
   userSignup,
