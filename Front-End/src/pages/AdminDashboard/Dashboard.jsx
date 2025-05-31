@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
 import api from "../../api/api";
@@ -17,7 +18,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userDatas, setUserDatas] = useState([]);
 
-  //Edit button
+  // Edit button
   const handleEditClick = (user) => {
     setEditUser(user);
     setFormData({ name: user.name, email: user.email });
@@ -26,25 +27,31 @@ const Dashboard = () => {
   };
 
   const handleClose = () => setModalOpen(false);
+
   const closeNewModal = () => {
     setNewModal(false);
     setNewUser({ email: "", name: "", password: "", confirmPassword: "" });
     setError({ email: "", name: "", password: "", confirmPassword: "" });
   };
 
-  //Not admin go back to login
+  // Not admin, go back to login
   useEffect(() => {
     const admin = JSON.parse(localStorage.getItem("admin"));
     if (!admin) {
-      navigate("/admin/login");
+      navigate("/admin/login", { replace: true });
     }
   }, [navigate]);
 
+  // Fetch users only if admin is authenticated
   useEffect(() => {
-    fetchUser();
+    const admin = JSON.parse(localStorage.getItem("admin"));
+    const token = localStorage.getItem("token");
+    if (admin && token) {
+      fetchUser();
+    }
   }, []);
 
-  //User fetch
+  // User fetch
   const fetchUser = () => {
     const token = localStorage.getItem("token");
     api
@@ -58,6 +65,12 @@ const Dashboard = () => {
       })
       .catch((error) => {
         console.log("user data fetching error", error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem("admin");
+          localStorage.removeItem("token");
+          navigate("/admin/login", { replace: true });
+          return;
+        }
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -67,9 +80,13 @@ const Dashboard = () => {
       });
   };
 
-  //Delete user
+  // Delete user
   const deleteuser = (userId) => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/admin/login", { replace: true });
+      return;
+    }
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to delete this user?",
@@ -86,15 +103,23 @@ const Dashboard = () => {
               Authorization: `Bearer ${token}`,
             },
           });
+          setUserDatas((prevUserDatas) =>
+            prevUserDatas.filter((user) => user._id !== userId)
+          );
           Swal.fire({
             icon: "success",
             title: "Success",
             text: res.data.msg || "User deleted successfully",
             confirmButtonText: "OK",
           });
-          fetchUser();
         } catch (error) {
           console.log("User deleting error", error);
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            localStorage.removeItem("admin");
+            localStorage.removeItem("token");
+            navigate("/admin/login", { replace: true });
+            return;
+          }
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -106,7 +131,7 @@ const Dashboard = () => {
     });
   };
 
-  //validation
+  // Validation
   const validateEdit = () => {
     let isValid = true;
     const newError = { name: "", email: "" };
@@ -136,10 +161,14 @@ const Dashboard = () => {
     return isValid;
   };
 
-  //Save data
+  // Save data
   const handleSave = async () => {
     if (validateEdit()) {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
       try {
         const response = await api.put(`/admin/users/${editUser._id}`, formData, {
           headers: {
@@ -156,6 +185,12 @@ const Dashboard = () => {
         fetchUser();
       } catch (error) {
         console.log("user updating error", error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem("admin");
+          localStorage.removeItem("token");
+          navigate("/admin/login", { replace: true });
+          return;
+        }
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -216,12 +251,16 @@ const Dashboard = () => {
     return isValid;
   };
 
-  //New user
+  // Adding New user
   const handleNewUserSave = async (e) => {
     e.preventDefault();
     if (validateNewUser()) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/admin/login", { replace: true });
+        return;
+      }
       try {
-        const token = localStorage.getItem("token");
         const response = await api.post(
           "/admin/users",
           {
@@ -235,6 +274,16 @@ const Dashboard = () => {
             },
           }
         );
+        setUserDatas((prevUserDatas) => [
+          ...prevUserDatas,
+          {
+            _id: response.data.user._id,
+            name: response.data.user.name,
+            email: response.data.user.email,
+            createdAt: response.data.user.createdAt || new Date().toISOString(),
+            profilePic: response.data.user.profilePic || [],
+          },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -243,9 +292,14 @@ const Dashboard = () => {
         });
         setNewModal(false);
         setNewUser({ email: "", name: "", password: "", confirmPassword: "" });
-        fetchUser();
       } catch (error) {
         console.log("Error adding new user:", error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem("admin");
+          localStorage.removeItem("token");
+          navigate("/admin/login", { replace: true });
+          return;
+        }
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -310,8 +364,8 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(searchQuery ? filterUserData : userDatas).map((users, index) => (
-                    <tr key={index}>
+                  {(searchQuery ? filterUserData : userDatas).map((users) => (
+                    <tr key={users._id}>
                       <td>
                         <div className="user-info">
                           <div className="user-avatar">
