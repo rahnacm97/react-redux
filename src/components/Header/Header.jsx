@@ -2,24 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../features/userSlice";
-import api from "../../api/api";
+import { getUserData } from "../../services/apiServices";
 import Swal from "sweetalert2";
 
-//User Header fn
 function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userData, setData] = useState(null);
   const { user } = useSelector((state) => state.user);
 
-  //Check user logged in
+  // Check user logged in
   useEffect(() => {
     if (!user) {
       navigate("/login");
     }
   }, [user, navigate]);
 
-  //Get user
+  // Get user
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userId = user?.user?._id;
@@ -27,11 +26,7 @@ function Header() {
     if (userId && token) {
       const fetchUserData = async () => {
         try {
-          const response = await api.get(`/auth/userdata/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await getUserData(userId, token);
           setData(response.data);
         } catch (error) {
           if (error.response?.status === 400 && error.response?.data?.msg === "User not found") {
@@ -63,7 +58,7 @@ function Header() {
     }
   }, [user?.user?._id, dispatch, navigate]);
 
-  //Logging out
+  // Logging out
   const handleLogout = () => {
     dispatch(logoutUser());
     localStorage.removeItem("user");
@@ -83,7 +78,7 @@ function Header() {
         <img
           src={
             userData?.user?.profilePic?.length
-              ? `http://localhost:3000/Uploads/${userData?.user?.profilePic[0]}`
+              ? `${import.meta.env.VITE_STATIC_BASE_URL}/Uploads/${userData?.user?.profilePic[0]}`
               : "/default-profile"
           }
           alt="Profile"

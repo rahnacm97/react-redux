@@ -1,7 +1,7 @@
-import "./UserProfile.css";
 import React, { useState, useEffect } from "react";
+import "./UserProfile.css";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../api/api";
+import { getUserProfile, updateUserProfile } from "../../services/apiServices";
 import Header from "../../components/Header/Header";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -20,7 +20,7 @@ const UserProfile = () => {
     if (userData) {
       setName(userData.user.name);
       setEmail(userData.user.email);
-      setErrors({ name: "", email: "" }); 
+      setErrors({ name: "", email: "" });
     }
   }, [userData]);
 
@@ -32,8 +32,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (id) {
-      api
-        .get(`/auth/profile/${id}`)
+      getUserProfile(id)
         .then((response) => {
           setUserData(response.data);
           setName(response.data.user.name);
@@ -96,13 +95,7 @@ const UserProfile = () => {
         formData.append("profilePic", selectedfile);
       }
       try {
-        const response = await api.post(
-          `/auth/profile/update/${id}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+        const response = await updateUserProfile(id, formData);
         setUserData(response.data);
         setSelectedFile(null);
         Swal.fire({
@@ -133,7 +126,7 @@ const UserProfile = () => {
           <div className="profile-pic-container">
             {userData?.user?.profilePic ? (
               <img
-                src={`http://localhost:3000/Uploads/${userData?.user?.profilePic?.[0]}`}
+                src={`${import.meta.env.VITE_STATIC_BASE_URL}/Uploads/${userData?.user?.profilePic?.[0]}`}
                 alt="Profile"
                 className="profile-pic"
               />

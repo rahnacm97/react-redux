@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UserSignup.css";
-import api from "../../api/api";
-
+import { userSignup } from "../../services/apiServices";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
-
 import { useDispatch } from "react-redux";
 import { setUser, setToken } from "../../features/userSlice";
+
 function UserSignup() {
   const dispatch = useDispatch();
   const [form, setForm] = useState({
@@ -26,43 +25,44 @@ function UserSignup() {
   const Validate = () => {
     let isValid = true;
     const newError = { name: "", email: "", password: "", confirmPassword: "" };
-    const namePattern = /^[A-Za-z. ]+$/;
+    const namePattern = /^[A-Za-z]+[A-Za-z ]*$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!form.name) {
       newError.name = "Name is required";
       isValid = false;
-    }
-    if (!namePattern.test(form.name)) {
-      newError.name = "Name should contain only letters and spaces";
+    } else if (!namePattern.test(form.name)) {
+      newError.name = "Name should contain only letters and spaces, with at least one letter";
+      isValid = false;
+    } else if (form.name.trim().length === 0) {
+      newError.name = "Name cannot be only spaces";
       isValid = false;
     }
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!form.email) {
       newError.email = "Email is required";
       isValid = false;
-    }
-    if (!emailPattern.test(form.email)) {
+    } else if (!emailPattern.test(form.email)) {
       newError.email = "Please enter a valid email address";
       isValid = false;
     }
-    if (form.password < 8) {
-      newError.password = "Password must be at least 8 characters long";
-      isValid = false;
-    }
+
     if (!form.password) {
       newError.password = "Password is required";
       isValid = false;
-    }
-    if (!form.confirmPassword) {
-      newError.confirmPassword = "Confirm Password is required ";
+    } else if (form.password.length < 8) {
+      newError.password = "Password must be at least 8 characters long";
       isValid = false;
     }
 
-    if (form.password !== form.confirmPassword) {
-      newError.confirmPassword = "Password is not match";
+    if (!form.confirmPassword) {
+      newError.confirmPassword = "Confirm Password is required";
+      isValid = false;
+    } else if (form.password !== form.confirmPassword) {
+      newError.confirmPassword = "Passwords do not match";
       isValid = false;
     }
+
     setErrors(newError);
     return isValid;
   };
@@ -72,7 +72,7 @@ function UserSignup() {
 
     if (Validate()) {
       try {
-        const response = await api.post("/auth/signup", form);
+        const response = await userSignup(form);
         Toastify({
           text: response.data.msg,
           duration: 3000,
@@ -85,6 +85,8 @@ function UserSignup() {
         }).showToast();
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
         navigate("/");
       } catch (error) {
         console.log("signup user error", error);
@@ -107,6 +109,7 @@ function UserSignup() {
   const handleLogin = () => {
     navigate("/");
   };
+
   return (
     <>
       <div className="signup-container">

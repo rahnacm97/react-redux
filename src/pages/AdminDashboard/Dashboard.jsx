@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
-import api from "../../api/api";
+import { fetchUsers, deleteUser, updateUser, addUser } from "../../services/apiServices";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../components/adminHeader/adminHeader";
@@ -54,12 +53,7 @@ const Dashboard = () => {
   // User fetch
   const fetchUser = () => {
     const token = localStorage.getItem("token");
-    api
-      .get("/admin/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    fetchUsers(token)
       .then((response) => {
         setUserDatas(response.data.userData);
       })
@@ -98,11 +92,7 @@ const Dashboard = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await api.delete(`/admin/users/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const res = await deleteUser(userId, token);
           setUserDatas((prevUserDatas) =>
             prevUserDatas.filter((user) => user._id !== userId)
           );
@@ -170,11 +160,7 @@ const Dashboard = () => {
         return;
       }
       try {
-        const response = await api.put(`/admin/users/${editUser._id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await updateUser(editUser._id, formData, token);
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -261,18 +247,13 @@ const Dashboard = () => {
         return;
       }
       try {
-        const response = await api.post(
-          "/admin/users",
+        const response = await addUser(
           {
             name: newUser.name,
             email: newUser.email,
             password: newUser.password,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          token
         );
         setUserDatas((prevUserDatas) => [
           ...prevUserDatas,
