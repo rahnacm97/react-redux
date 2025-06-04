@@ -7,7 +7,6 @@ const initialState = {
 };
 
 //User Authentication slice
-
 const userSlice = createSlice({
   name: "user",
   initialState,
