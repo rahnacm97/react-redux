@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, setToken } from "../../features/userSlice";
-import api from "../../api/api";
+import { userLogin } from "../../services/apiServices";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import "./UserLogin.css";
@@ -49,7 +49,7 @@ function UserLogin() {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await api.post("/auth/login", form);
+        const response = await userLogin(form);
         Toastify({
           text: response.data.msg,
           duration: 3000,

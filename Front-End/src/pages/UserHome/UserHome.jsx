@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./UserHome.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/api";
+import { getUserById } from "../../services/apiServices";
 import Swal from "sweetalert2";
 import { logoutUser } from "../../features/userSlice";
 import Header from "../../components/Header/Header";
@@ -27,9 +27,7 @@ function UserHome() {
 
       try {
         const token = localStorage.getItem("token");
-        const res = await api.get(`/auth/users/${user._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await getUserById(user._id, token);
         setUserData(res.data.user);
       } catch (error) {
         if (
@@ -75,7 +73,7 @@ function UserHome() {
             <img
               src={
                 userData?.profilePic?.length
-                  ? `http://localhost:3000/Uploads/${userData.profilePic[0]}`
+                  ? `${import.meta.env.VITE_STATIC_BASE_URL}/Uploads/${userData.profilePic[0]}`
                   : "/default-profile"
               }
               alt="User Profile"
