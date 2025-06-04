@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const DB = require('./DB/db')
 const userRouter = require('./Router/userRouter')
-const adminRotuer = require('./Router/adminRouter');
+const adminRouter = require('./Router/adminRouter');
 const bodyParser = require('body-parser')
 const path = require('path')
 require('dotenv').config()
@@ -18,7 +18,7 @@ app.use(bodyParser.json())
 
 app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use('/api/auth',userRouter);
-app.use('/api/admin',adminRotuer)
+app.use('/api/admin',adminRouter)
 
 DB()
 

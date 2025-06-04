@@ -1,8 +1,8 @@
 const Admin = require("../Models/adminShema");
 const User = require("../Models/userSchema");
 const jwt = require("jsonwebtoken");
-const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
+//const env = require("dotenv").config();
 
 //Admin Login
 const AdminLoginPage = async (req, res) => {
@@ -21,7 +21,7 @@ const AdminLoginPage = async (req, res) => {
     return res
       .status(200)
       .json({
-        msg: "Admin loggind successfully",
+        msg: "Admin logged in successfully",
         admin: { _id: admin._id, email: admin.email },
         token,
       });

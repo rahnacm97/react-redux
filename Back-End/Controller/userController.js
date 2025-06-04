@@ -1,8 +1,8 @@
 const User = require("../Models/userSchema");
 const jwt = require("jsonwebtoken");
-const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+//const env = require("dotenv").config();
 
 //User registration
 const userSignup = async (req, res) => {
@@ -98,7 +98,7 @@ const updateProfile = async (req, res) => {
       new: true,
     });
     if (!updateUser) {
-      return res.status(404).json({ msg: "User not found" });
+      return res.status(400).json({ msg: "User not found" });
     }
 
     return res.status(200).json({
